@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Phinder by BabaSecure: enter a phone number and find the registered account name across wallets and payment service banks.">
+<meta name="theme-color" content="#07090e">
+<meta name="robots" content="noindex">
+<title>Phinder — BabaSecure</title>
+<link rel="icon" href="../BabaSecure%20nobg.png">
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="../logo.css">
+<style>
+.ph-form{max-width:560px}
+.ph-row{display:flex;gap:10px}
+.ph-input{flex:1;min-width:0;background:#0a0e16;border:1px solid var(--line);border-radius:8px;padding:16px 16px;color:var(--ink);font:500 15px var(--sans);outline:none;transition:border-color .2s,box-shadow .2s}
+.ph-input::placeholder{color:#5f6c82}
+.ph-input:focus{border-color:#528dff;box-shadow:0 0 0 3px rgba(38,115,255,.22)}
+.ph-row .button{border:0;cursor:pointer;color:#fff;white-space:nowrap;gap:18px}
+.ph-row .button:disabled{opacity:.6;cursor:progress;transform:none}
+.ph-sub{display:flex;align-items:center;gap:22px;margin-top:18px}
+.ph-sub .text-button{background:none;border:0;cursor:pointer;padding:0;font-size:12px}
+.ph-result{margin-top:22px;border:1px solid var(--line);background:linear-gradient(135deg,#101723,#0b0f17 55%);padding:20px 22px;max-width:560px}
+.ph-result[data-state=success]{border-color:#3b78e0;background:linear-gradient(120deg,#102447,#0b0f17 70%);animation:ph-in .45s ease}
+.ph-result[data-state=error]{border-color:rgba(255,124,131,.4)}
+.ph-rlabel{font:500 10px var(--mono);color:#9fbbec;letter-spacing:1.6px;text-transform:uppercase;margin:0 0 10px;display:flex;align-items:center;gap:9px}
+.ph-rlabel:before{content:"";width:18px;height:1px;background:#4288ff;box-shadow:0 0 8px #4288ff}
+.ph-result[data-state=error] .ph-rlabel{color:#ff9aa0}
+.ph-rname{font-size:clamp(24px,2.8vw,34px);font-weight:600;letter-spacing:-1.2px;line-height:1.15;margin:0;overflow-wrap:anywhere}
+.ph-rtext{margin:0;font-size:14px;line-height:1.7;color:var(--muted)}
+.ph-rmeta{font:11px/1.7 var(--mono);color:#7d889a;margin:8px 0 0}
+.ph-rmeta+.ph-rname{margin-top:20px}
+.system.scanning .core{animation-duration:.9s}
+.system.scanning .orbit-c{animation-duration:6s}
+.system.scanning .system-label b{color:#8fd0ff}
+a:focus-visible,button:focus-visible{outline:2px solid #66b9ff;outline-offset:2px}
+@keyframes ph-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media(max-width:600px){.ph-row{flex-direction:column}.ph-row .button{min-height:51px}}
+</style>
+</head>
+<body>
+<div class="progress" aria-hidden="true"><i></i></div>
+<div class="cursor-glow" aria-hidden="true"></div>
+
+<header class="site-header" id="top">
+  <a class="brand" href="https://babasecure.com/" aria-label="BabaSecure home"><img src="../BabaSecure%20nobg.png" alt=""><span>Baba<span>Secure</span></span></a>
+  <nav class="desktop-nav" aria-label="Main navigation">
+    <a href="#lookup">Lookup</a><a href="#how">How it works</a><a href="https://babasecure.com/#services">Services</a><a href="https://babasecure.com/#contact">Contact</a>
+  </nav>
+  <a class="nav-cta" href="https://babasecure.com/">babasecure.com <b>↗</b></a>
+  <button class="menu-toggle" aria-expanded="false" aria-controls="mobile-nav" aria-label="Open menu"><i></i><i></i></button>
+</header>
+<div class="mobile-nav" id="mobile-nav" aria-hidden="true">
+  <a href="#lookup">Lookup</a><a href="#how">How it works</a><a href="https://babasecure.com/#services">Services</a><a href="https://babasecure.com/#contact">Contact</a>
+  <a class="button primary" href="https://babasecure.com/">babasecure.com <span>↗</span></a>
+</div>
+
+<main>
+  <section class="hero" id="lookup" aria-labelledby="hero-title">
+    <div class="hero-copy reveal">
+      <p class="eyebrow"><i></i> Phinder · Phone number lookup</p>
+      <h1 id="hero-title">Find the account<br>behind the <em>number.</em></h1>
+      <p class="hero-text">Enter a phone number in any format. Phinder normalizes it and checks every wallet, payment service bank and fintech at once.</p>
+
+      <div class="ph-form">
+        <div class="ph-row">
+          <input class="ph-input" id="phone" type="tel" placeholder="Phone number" autocomplete="off" aria-label="Phone number">
+          <button class="button primary" id="search" type="button">Search all providers <span>↗</span></button>
+        </div>
+        <div class="ph-sub"><button class="button text-button" id="downloadBanks" type="button">Download provider codes <span>↓</span></button></div>
+      </div>
+      <div class="ph-result" id="result" role="status" aria-live="polite" data-state="idle"><p class="ph-rtext">Results appear here.</p></div>
+    </div>
+
+    <div class="system" id="system" aria-label="Abstract animated network visualization" role="img">
+      <div class="orb orb-one"></div><div class="orb orb-two"></div>
+      <div class="orbit orbit-a"></div><div class="orbit orbit-b"></div><div class="orbit orbit-c"></div>
+      <div class="system-grid"></div>
+      <div class="node n1"></div><div class="node n2"></div><div class="node n3"></div><div class="node n4"></div><div class="node n5"></div>
+      <svg viewBox="0 0 600 600" aria-hidden="true"><path d="M87 374 212 270 323 338 473 205"/><path d="M125 152 212 270 323 338 399 440"/><path d="M212 270 285 115 473 205"/></svg>
+      <div class="core"><span>BS</span><small>ACTIVE</small></div>
+      <div class="system-label label-a">PROVIDERS <b>ALL CHECKED</b></div><div class="system-label label-b">NUMBER <b>NORMALIZED</b></div>
+    </div>
+    <div class="scroll-cue"><span></span> Scroll to explore</div>
+  </section>
+
+  <section class="approach section" id="how">
+    <div class="section-head reveal"><p class="eyebrow"><i></i> How it works</p><h2>One number.<br>Every provider.</h2></div>
+    <div class="process">
+      <div class="process-line" aria-hidden="true"><i></i></div>
+      <article class="process-step reveal"><span>01</span><div><h3>Normalize</h3><p>Spaces, brackets, +234, 234, 00234 and a leading 0 are all handled. Type it however you have it.</p></div></article>
+      <article class="process-step reveal"><span>02</span><div><h3>Search</h3><p>The number is checked against every wallet, payment service bank and fintech in Paystack’s live directory.</p></div></article>
+      <article class="process-step reveal"><span>03</span><div><h3>Match</h3><p>Each provider that holds the number returns the name registered to it. Nothing is stored.</p></div></article>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <a class="brand" href="https://babasecure.com/"><img src="../BabaSecure%20nobg.png" alt=""><span>Baba<span>Secure</span></span></a>
+  <p>Security clarity for what’s next.</p>
+  <div><a href="#lookup">Lookup</a><a href="#how">How it works</a><a href="https://babasecure.com/#contact">Contact</a></div>
+  <small>© <span id="year"></span> BabaSecure. All rights reserved.</small>
+</footer>
+
+<script src="../script.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const result = $('result'), system = $('system');
+const el = (tag, cls, text) => { const e = document.createElement(tag); e.className = cls; e.textContent = text; return e; };
+const setResult = (state, items) => { result.dataset.state = state; result.replaceChildren(...items); };
+
+$('downloadBanks').addEventListener('click', async () => {
+  try {
+    const r = await fetch('/api/banks'), d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Provider list unavailable.');
+    const esc = v => '"' + String(v ?? '').replaceAll('"', '""') + '"';
+    const csv = ['Name,Paystack code,NIP institution code,Type,Active',
+      ...d.banks.map(b => [b.name, b.code, b.nipCode, b.type, b.active].map(esc).join(','))].join('\r\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+    a.download = 'paystack-nigeria-bank-codes.csv'; a.click(); URL.revokeObjectURL(a.href);
+  } catch (err) { setResult('error', [el('p', 'ph-rlabel', 'Download failed'), el('p', 'ph-rtext', err.message)]); }
+});
+
+async function lookup() {
+  const phone = $('phone').value.trim(), btn = $('search');
+  if (!phone) { setResult('error', [el('p', 'ph-rlabel', 'No number'), el('p', 'ph-rtext', 'Enter a phone number.')]); $('phone').focus(); return; }
+  btn.disabled = true; system.classList.add('scanning');
+  setResult('idle', [el('p', 'ph-rlabel', 'Searching'), el('p', 'ph-rtext', 'Checking all providers. This can take several seconds…')]);
+  try {
+    const res = await fetch('/api/resolve', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ phone }) });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Lookup failed.');
+    const note = data.incomplete?.length ? ` ${data.incomplete.length} provider(s) did not respond: ${data.incomplete.join(', ')}.` : '';
+    if (!data.matches.length) {
+      setResult('error', [el('p', 'ph-rlabel', 'No match'), el('p', 'ph-rtext', `No registered name found for ${data.normalized} at ${data.checked} providers.${note}`)]);
+    } else {
+      const items = [el('p', 'ph-rlabel', `${data.matches.length} ${data.matches.length === 1 ? 'match' : 'matches'} · ${data.normalized}`)];
+      for (const m of data.matches) items.push(el('p', 'ph-rname', m.accountName), el('p', 'ph-rmeta', m.bank));
+      items.push(el('p', 'ph-rmeta', `Checked ${data.checked} providers · ${new Date(data.timestamp).toLocaleString()}${note}`));
+      setResult('success', items);
+    }
+  } catch (err) {
+    setResult('error', [el('p', 'ph-rlabel', 'No result'), el('p', 'ph-rtext', err.message || 'Could not reach the service.')]);
+  } finally { btn.disabled = false; system.classList.remove('scanning'); }
+}
+$('search').addEventListener('click', lookup);
+$('phone').addEventListener('keydown', e => { if (e.key === 'Enter') lookup(); });
+</script>
+</body>
+</html>
