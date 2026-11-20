@@ -1,0 +1,4 @@
+# Local-only Cloudflare Pages Functions secret. Never commit a real key.
+PAYSTACK_SECRET_KEY=your_paystack_test_secret_key
+# Optional. Defaults to wallet and payment-service providers only.
+# PROVIDER_SCOPE=all

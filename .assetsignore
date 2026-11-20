@@ -1,0 +1,16 @@
+.git/
+.gitignore
+.assetsignore
+.dev.vars
+.dev.vars.example
+.wrangler/
+functions/
+worker.js
+wrangler.jsonc
+create_invoice_0017.py
+create_invoice_template.py
+output/
+tmp/
+Phinder/.env
+Phinder/server.js
+Phinder/README.md
